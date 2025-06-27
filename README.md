@@ -56,7 +56,7 @@ require('toggle').setup({
 
     -- Customize the cursor style toggle
     cursor_style = {
-      key = 'c', -- change key to <leader>c
+      key = 'c', -- change key to <leader>Tc
       values = { 'block', 'ver25' }, -- only cycle between block and vertical
     },
 
