@@ -5,6 +5,7 @@ M.defaults = {
   toggles = {
     {
       id = 'relative_line_numbers',
+      enabled = true,
       key = 'r',
       toggle = function(value)
         vim.opt.relativenumber = value
@@ -13,6 +14,7 @@ M.defaults = {
     },
     {
       id = 'cursor_style',
+      enabled = true,
       key = 'z',
       values = { 'block', 'hor20', 'ver25' },
       toggle = function(value)

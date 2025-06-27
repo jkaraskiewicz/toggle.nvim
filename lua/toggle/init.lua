@@ -77,6 +77,10 @@ H.sync_stored_state = function(opts)
     local key = value.key
     local toggle_fn = value.toggle
     local desc = value.desc
+    local enabled = value.enabled
+
+    -- Skip disabled toggles
+    if not enabled then goto continue end
 
     -- Initialize state to 1 (first value) if not present
     state[id] = state[id] or 1
@@ -107,6 +111,8 @@ H.sync_stored_state = function(opts)
 
     -- Apply the initial state when setup is called
     toggle_fn(current_value)
+
+    ::continue::
   end
 
   H.write_state_as_json(state)
