@@ -62,7 +62,7 @@ H.sync_stored_state = function(opts)
 
   -- Remove stale entries from the stored state file
   local in_config = function(id, _)
-    return utils.tables.contains(opts_toggles, function(_, value) return id == value.id end)
+    return utils.tables.contains(opts_toggles, function(config_id, _) return id == config_id end)
   end
 
   local leftovers = utils.tables.filter_not(state, in_config)
@@ -71,8 +71,7 @@ H.sync_stored_state = function(opts)
   end
 
   -- Add/update toggles based on config
-  for _, value in ipairs(opts_toggles) do
-    local id = value.id
+  for id, value in pairs(opts_toggles) do
     local values = value.values or { false, true }
     local key = value.key
     local toggle_fn = value.toggle

@@ -3,8 +3,7 @@ local M = {}
 M.defaults = {
   prefix = '<leader>t',
   toggles = {
-    {
-      id = 'relative_line_numbers',
+    relative_line_numbers = {
       enabled = true,
       key = 'r',
       toggle = function(value)
@@ -12,8 +11,7 @@ M.defaults = {
       end,
       desc = 'Relative line numbers',
     },
-    {
-      id = 'cursor_style',
+    cursor_style = {
       enabled = true,
       key = 'z',
       values = { 'block', 'hor20', 'ver25' },
