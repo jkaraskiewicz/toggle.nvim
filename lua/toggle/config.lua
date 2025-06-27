@@ -13,7 +13,7 @@ M.defaults = {
     },
     {
       id = 'cursor_style',
-      key = 'c',
+      key = 'z',
       values = { 'block', 'hor20', 'ver25' },
       toggle = function(value)
         vim.opt.guicursor = 'n-v-c:default,i-ci-ve:ver25,r-cr:hor20,o:hor50'
