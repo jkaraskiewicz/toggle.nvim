@@ -1,13 +1,13 @@
 local M = {}
 local H = {}
 
-local utils = require('toggle.utils')
+local utils = require('utils')
 
 local data_dir = vim.fn.stdpath('data')
 local plugin_data_dir = data_dir .. '/toggle'
 local filepath = plugin_data_dir .. '/state'
 
-M.clues = {}
+H.clues = {}
 
 M.setup = function(opts)
   local config = require('toggle.config')
@@ -99,7 +99,7 @@ H.sync_stored_state = function(opts)
     end
 
     -- Add clues for mini.clue
-    table.insert(M.clues, { mode = 'n', keys = opts.prefix .. key, postkeys = opts.prefix })
+    table.insert(H.clues, { mode = 'n', keys = opts.prefix .. key, postkeys = opts.prefix })
 
     -- Setup keymaps for toggles
     vim.keymap.set('n', opts.prefix .. key, callback,
@@ -110,6 +110,10 @@ H.sync_stored_state = function(opts)
   end
 
   H.write_state_as_json(state)
+end
+
+M.clues = function()
+  return H.clues
 end
 
 return M
