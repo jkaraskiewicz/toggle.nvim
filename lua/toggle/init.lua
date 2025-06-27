@@ -1,11 +1,13 @@
 local M = {}
 local H = {}
 
+local utils = require('toggle.utils')
+
 local data_dir = vim.fn.stdpath('data')
 local plugin_data_dir = data_dir .. '/toggle'
 local filepath = plugin_data_dir .. '/state'
 
-local utils = require('toggle.utils')
+M.clues = {}
 
 M.setup = function(opts)
   local config = require('toggle.config')
@@ -15,7 +17,6 @@ M.setup = function(opts)
 
   H.sync_stored_state(config.options)
 end
-
 
 H.read_state_for_id = function(id)
   local state = H.read_state_as_json()
@@ -33,6 +34,8 @@ H.read_state_as_json = function()
   if file then
     local json_string = file:read('*a')
     file:close()
+    -- Handle empty file case
+    if json_string == '' then return {} end
     return vim.json.decode(json_string)
   else
     return {}
@@ -49,6 +52,10 @@ H.write_state_as_json = function(data)
   end
 end
 
+H.get_description = function(desc, value)
+  return string.format('%s (current: %s)', desc, value)
+end
+
 H.sync_stored_state = function(opts)
   local state = H.read_state_as_json()
   local opts_toggles = opts.toggles
@@ -63,7 +70,7 @@ H.sync_stored_state = function(opts)
     state[k] = nil
   end
 
-  -- Add new entries from the opts to the stored state file
+  -- Add/update toggles based on config
   for _, value in ipairs(opts_toggles) do
     local id = value.id
     local values = value.values or { false, true }
@@ -71,12 +78,35 @@ H.sync_stored_state = function(opts)
     local toggle_fn = value.toggle
     local desc = value.desc
 
-    state[id] = state[id] or 0
-    local value_to_set = values[state[id]]
+    -- Initialize state to 1 (first value) if not present
+    state[id] = state[id] or 1
+    local current_value = values[state[id]]
 
-    vim.keymap.set('n', opts.prefix .. key, function() end, { noremap = true, silent = true, desc = desc })
+    -- The keymap callback that cycles through the values
+    local callback
+    callback = function()
+      local current_index = H.read_state_for_id(id) or 1
+      local next_index = current_index % #values + 1
 
-    toggle_fn(value_to_set)
+      H.write_state_for_id(id, next_index)
+
+      local new_value = values[next_index]
+      toggle_fn(new_value)
+
+      -- Adjust description for the keymap reflecting the new value
+      vim.keymap.set('n', opts.prefix .. key, callback,
+        { noremap = true, silent = true, desc = H.get_description(desc, new_value) })
+    end
+
+    -- Add clues for mini.clue
+    table.insert(M.clues, { mode = 'n', keys = opts.prefix .. key, postkeys = opts.prefix })
+
+    -- Setup keymaps for toggles
+    vim.keymap.set('n', opts.prefix .. key, callback,
+      { noremap = true, silent = true, desc = H.get_description(desc, current_value) })
+
+    -- Apply the initial state when setup is called
+    toggle_fn(current_value)
   end
 
   H.write_state_as_json(state)
