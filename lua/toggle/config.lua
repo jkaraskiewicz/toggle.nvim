@@ -27,6 +27,24 @@ M.defaults = {
       end,
       desc = 'Cursor style',
     },
+    color_column = {
+      enabled = true,
+      key = 'l',
+      values = {
+        {
+          desc = 'Off',
+          value = '',
+        },
+        {
+          desc = 'On',
+          value = '80',
+        },
+      },
+      toggle = function(value)
+        vim.opt.colorcolumn = value
+      end,
+      desc = 'Color column',
+    },
   },
 }
 

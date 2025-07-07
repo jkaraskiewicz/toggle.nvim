@@ -56,6 +56,14 @@ H.get_description = function(desc, value)
   return string.format('%s (current: %s)', desc, value)
 end
 
+H.unpack_value = function(value)
+  if type(value) == 'table' then
+    return value.desc, value.value
+  else
+    return value, value
+  end
+end
+
 H.sync_stored_state = function(opts)
   local state = H.read_state_as_json()
   local opts_toggles = opts.toggles
@@ -84,6 +92,7 @@ H.sync_stored_state = function(opts)
     -- Initialize state to 1 (first value) if not present
     state[id] = state[id] or 1
     local current_value = values[state[id]]
+    local current_value_desc, current_value_content = H.unpack_value(current_value)
 
     -- The keymap callback that cycles through the values
     local callback
@@ -94,11 +103,12 @@ H.sync_stored_state = function(opts)
       H.write_state_for_id(id, next_index)
 
       local new_value = values[next_index]
-      toggle_fn(new_value)
+      local new_value_desc, new_value_content = H.unpack_value(new_value)
+      toggle_fn(new_value_content)
 
       -- Adjust description for the keymap reflecting the new value
       vim.keymap.set('n', opts.prefix .. key, callback,
-        { noremap = true, silent = true, desc = H.get_description(desc, new_value) })
+        { noremap = true, silent = true, desc = H.get_description(desc, new_value_desc) })
     end
 
     -- Add clues for mini.clue
@@ -106,10 +116,10 @@ H.sync_stored_state = function(opts)
 
     -- Setup keymaps for toggles
     vim.keymap.set('n', opts.prefix .. key, callback,
-      { noremap = true, silent = true, desc = H.get_description(desc, current_value) })
+      { noremap = true, silent = true, desc = H.get_description(desc, current_value_desc) })
 
     -- Apply the initial state when setup is called
-    toggle_fn(current_value)
+    toggle_fn(current_value_content)
 
     ::continue::
   end
