@@ -32,11 +32,11 @@ M.defaults = {
       key = 'l',
       values = {
         {
-          desc = 'Off',
+          desc = 'off',
           value = '',
         },
         {
-          desc = 'On',
+          desc = 'on',
           value = '80',
         },
       },
